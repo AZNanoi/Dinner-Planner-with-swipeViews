@@ -228,37 +228,47 @@ public class ChooseMenuLayout implements Observer {
         ((TextView) popupView.findViewById(R.id.textView17)).setText(dish.getName());
 
 
-        //Calculate dish price
-
-        model.getDishInfoById(dish.getId(), new AsyncData() {
-            @Override
-            public void onData(JSONObject response) {
-                try{
-                    JSONArray ingredients = response.getJSONArray("extendedIngredients");
-                    float dish_cost = 0;
-                    for(int i = 0; i < ingredients.length(); i++){
-                        JSONObject ing = (JSONObject) ingredients.get(i);
-                        Ingredient ingO = new Ingredient(ing.getString("name"), ing.getInt("amount"), ing.getString("unit"), ing.getInt("amount"));
-                        dish.addIngredient(ingO);
-                        dish_cost += ing.getInt("amount");
-                        if(i == ingredients.length()-1){
-                            System.out.print("setTagIng:::"+dish.getIngredients().size());
-                            ((Button) popupView.findViewById(R.id.select_dish_button)).setTag(dish);
+        if(dish.getIngredients().size() <= 0){
+            //Calculate dish price
+            model.getDishInfoById(dish.getId(), new AsyncData() {
+                @Override
+                public void onData(JSONObject response) {
+                    try{
+                        JSONArray ingredients = response.getJSONArray("extendedIngredients");
+                        float dish_cost = 0;
+                        for(int i = 0; i < ingredients.length(); i++){
+                            JSONObject ing = (JSONObject) ingredients.get(i);
+                            Ingredient ingO = new Ingredient(ing.getString("name"), ing.getInt("amount"), ing.getString("unit"), ing.getInt("amount"));
+                            dish.addIngredient(ingO);
+                            dish_cost += ing.getInt("amount");
+                            if(i == ingredients.length()-1){
+                                System.out.println("setTagIng:::"+dish.getIngredients().size());
+                                ((Button) popupView.findViewById(R.id.select_dish_button)).setTag(dish);
+                            }
                         }
+                        ((TextView) popupView.findViewById(R.id.total_dish_cost)).setText("Cost: " + String.valueOf(dish_cost * model.getNumberOfGuests()) + "kr");
+                        ((TextView) popupView.findViewById(R.id.cost_per_person)).setText("(" + String.valueOf(dish_cost) + "kr / Person)");
+                    }catch (JSONException e){
+                        Log.e("MYAPP", "unexpected JSON exception", e);
                     }
-                    ((TextView) popupView.findViewById(R.id.total_dish_cost)).setText("Cost: " + String.valueOf(dish_cost * model.getNumberOfGuests()) + "kr");
-                    ((TextView) popupView.findViewById(R.id.cost_per_person)).setText("(" + String.valueOf(dish_cost) + "kr / Person)");
-                }catch (JSONException e){
-                    Log.e("MYAPP", "unexpected JSON exception", e);
+
                 }
 
+                @Override
+                public void onError(String errorMessage) {
+                    Toast.makeText(view.getContext(), "There was error retrieving data.", Toast.LENGTH_LONG).show();
+                }
+            });
+        }else{
+            float dish_cost = 0;
+            Set<Ingredient> allIngredients = dish.getIngredients();
+            for(Ingredient ing: allIngredients){
+                dish_cost += ing.getQuantity();
             }
-
-            @Override
-            public void onError(String errorMessage) {
-                Toast.makeText(view.getContext(), "There was error retrieving data.", Toast.LENGTH_LONG).show();
-            }
-        });
+            ((Button) popupView.findViewById(R.id.select_dish_button)).setTag(dish);
+            ((TextView) popupView.findViewById(R.id.total_dish_cost)).setText("Cost: " + String.valueOf(dish_cost * model.getNumberOfGuests()) + "kr");
+            ((TextView) popupView.findViewById(R.id.cost_per_person)).setText("(" + String.valueOf(dish_cost) + "kr / Person)");
+        }
         /*Set<Ingredient> ingredients = dish.getIngredients();
         Iterator<Ingredient> iterate_ingredients = ingredients.iterator();
         while (iterate_ingredients.hasNext()){
