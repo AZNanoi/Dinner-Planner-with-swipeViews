@@ -104,31 +104,19 @@ public class ChooseMenuLayoutController implements OnClickListener{
         }else if (v == view.back_menu_button){
             mPager.setCurrentItem(0);
         }else if(v == view.popupView.findViewById(R.id.select_dish_button)){
-            System.out.println("select_dish_button clicked");
             view.popupWindow.dismiss();
             Dish dish = (Dish) v.getTag();
             model.addDishToMenu(dish);
 
             LinearLayout dishView = (LinearLayout) view.view.findViewWithTag(dish).getParent();
-            dishView.setBackgroundResource(R.drawable.border);
-            if(dish.getType() == 1){
-                if(view.view.findViewWithTag("Selected Starter") != null){
-                    view.view.findViewWithTag("Selected Starter").setBackgroundResource(0);
-                }
-                dishView.setTag("Selected Starter");
-            }else if(dish.getType() == 2){
-                if(view.view.findViewWithTag("Selected Main") != null){
-                    view.view.findViewWithTag("Selected Main").setBackgroundResource(0);
-                }
-                dishView.setTag("Selected Main");
-            }else if(dish.getType() == 3){
-                if(view.view.findViewWithTag("Selected Dessert") != null){
-                    view.view.findViewWithTag("Selected Dessert").setBackgroundResource(0);
-                }
-                dishView.setTag("Selected Dessert");
+            LinearLayout dishViewContainer = (LinearLayout) dishView.getParent();
+            View previousSelected = dishViewContainer.findViewWithTag("Selected");
+            if(previousSelected != null){
+                previousSelected.setBackgroundResource(0);
+                previousSelected.setTag("");
             }
-        }else{
-            //System.out.println("Image clicked");
+            dishView.setTag("Selected");
+            dishView.setBackgroundResource(R.drawable.border);
         }
     }
 
