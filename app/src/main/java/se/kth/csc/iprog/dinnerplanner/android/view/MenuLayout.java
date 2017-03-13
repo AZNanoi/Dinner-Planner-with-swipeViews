@@ -100,36 +100,28 @@ public class MenuLayout implements Observer {
                     InputStream is = (InputStream) url.getContent();
                     Drawable drawable = Drawable.createFromStream(is, "src name");
                     if(d.getType() == 1){
-
-                        if(d.getName().length() >= 10){
-                            starter_dish_name.setText(d.getName().substring(0,10));
-                        }else{
-                            starter_dish_name.setText(d.getName());
-                        }
-                        starter_dish.setImageDrawable(drawable);
-                        starter_dish.setTag(d);
+                        displayDishes(d, starter_dish_name, starter_dish, drawable);
                     }else if(d.getType() == 2){
-                        if(d.getName().length() >= 10){
-                            main_dish_name.setText(d.getName().substring(0,10));
-                        }else{
-                            main_dish_name.setText(d.getName());
-                        }
-                        main_dish.setImageDrawable(drawable);
-                        main_dish.setTag(d);
+                        displayDishes(d, main_dish_name, main_dish, drawable);
                     }else if(d.getType() == 3){
-                        if(d.getName().length() >= 10){
-                            dessert_dish_name.setText(d.getName().substring(0,10));
-                        }else{
-                            dessert_dish_name.setText(d.getName());
-                        }
-                        dessert_dish.setImageDrawable(drawable);
-                        dessert_dish.setTag(d);
+                        displayDishes(d, dessert_dish_name, dessert_dish, drawable);
                     }
                 }catch (Exception e){
                     System.out.println("Error:"+e);
                 }
             }
         }
+    }
+    
+    //Display name, image and set tag for tag dish element
+    private void displayDishes(Dish d, TextView name_container, ImageView img_container, Drawable drawable){
+        if(d.getName().length() >= 10){
+            name_container.setText(d.getName().substring(0,10));
+        }else{
+            name_container.setText(d.getName());
+        }
+        img_container.setImageDrawable(drawable);
+        img_container.setTag(d);
     }
 
     public void removeImageViewBorder(){
